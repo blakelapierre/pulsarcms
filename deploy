@@ -9,5 +9,6 @@ cd ../api
 
 cd ../frontend
 	npm install
+	bower install
 	grunt build
 	static -p 9999 dist
