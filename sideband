@@ -3,3 +3,5 @@ using this as a place to commit to. <-- watchmen picks the project up on commit,
 machine was missing memcached
 
 thought i saw an error, so I killed the deploy...there wasn't one
+
+watchmen is now running
