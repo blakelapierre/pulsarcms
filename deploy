@@ -10,4 +10,4 @@ cd ../api
 cd ../frontend
 	npm install
 	grunt build
-	static -p 9999 app
+	static -p 9999 dist
