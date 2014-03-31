@@ -1,0 +1,12 @@
+#!/bin/bash
+
+cd data
+	sh start
+
+cd ../api
+	sh start &
+
+cd ../frontend
+	npm install
+	grunt build
+	static -p 9999

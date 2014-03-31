@@ -17,5 +17,3 @@ memcached -d
 
 echo "starting local mongod"
 mongod --config=mongod.conf --smallfiles --fork
-
-mongo
