@@ -4,6 +4,7 @@ cd data
 	sh start
 
 cd ../api
+	npm install
 	sh start &
 
 cd ../frontend
