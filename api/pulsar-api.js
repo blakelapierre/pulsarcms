@@ -38,8 +38,11 @@ app.log = winston;
 
 app.checkAuthentication = function (req, res, message) {
   if (!req.session.user || !req.session.authenticated.status) {
-    app.log.error('authentication check failed', req.session, message);
-    res.json(500, { 'message': message });
+    app.log.error(message);
+    res.json(500, {
+      'error': 'Authentication Failed',
+      'message': message
+    });
     return false;
   }
   return true;
@@ -55,6 +58,19 @@ app.checkAdmin = function (req, res, message) {
     return false;
   }
   return true;
+};
+
+app.checkError = function (err, res, label) {
+  if (err) {
+    if (label) {
+      app.log.log(label, err);
+    } else {
+      app.log.error(err);
+    }
+    res.json(500, err);
+    return true;
+  }
+  return false;
 };
 
 var server = require('http').createServer(app);
@@ -104,7 +120,7 @@ db.on('open', function ( ) {
   var io = null;
   if (socketioConfig.enabled) {
     io = require('socket.io').listen(server);
-    io.set('origins', 'http://api.robcolbert.com:10010');//config.cors.allowOrigins.join(','));
+    io.set('origins', 'http://robcolbert.com:80');//config.cors.allowOrigins.join(','));
 
     if (socketioConfig.client.minify) {
       io.enable('browser client minification');
