@@ -5,3 +5,5 @@ machine was missing memcached
 thought i saw an error, so I killed the deploy...there wasn't one
 
 watchmen is now running
+
+launching my pulsar instance
