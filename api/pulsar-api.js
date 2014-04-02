@@ -62,11 +62,7 @@ app.checkAdmin = function (req, res, message) {
 
 app.checkError = function (err, res, label) {
   if (err) {
-    if (label) {
-      app.log.log(label, err);
-    } else {
-      app.log.error(err);
-    }
+    app.log.error(label, err);
     res.json(500, err);
     return true;
   }
@@ -115,24 +111,37 @@ db.on('open', function ( ) {
   server.listen(config.bind.port, config.bind.address);
 
   // socket.io instance and startup
-  var socketioConfig = config.app.socketio;
-  app.log.info('socket.io', socketioConfig);
+  var socketIoConfig = config.app.socketio;
+  app.log.info('socket.io config', socketIoConfig);
   var io = null;
-  if (socketioConfig.enabled) {
-    io = require('socket.io').listen(server);
-    io.set('origins', 'http://robcolbert.com:80');//config.cors.allowOrigins.join(','));
-
-    if (socketioConfig.client.minify) {
+  if (socketIoConfig.enabled) {
+    io = require('socket.io').listen(server, {
+      logger: {
+        debug: app.log.debug,
+        info: app.log.info,
+        error: app.log.error,
+        warn: app.log.warn
+      }
+    });
+    io.set('origins', socketIoConfig.allowOrigin);
+    io.set('transports', [
+      'websocket',
+      'flashsocket',
+      'htmlfile',
+      'xhr-polling',
+      'jsonp-polling'
+    ]);
+    if (socketIoConfig.client.minify) {
       io.enable('browser client minification');
     }
-    if (socketioConfig.client.etag) {
+    if (socketIoConfig.client.etag) {
       io.enable('browser client etag');
     }
-    if (socketioConfig.client.gzip) {
+    if (socketIoConfig.client.gzip) {
       io.enable('browser client gzip');
     }
-    if (socketioConfig.logLevel) {
-      io.set('log level', socketioConfig.logLevel);
+    if (socketIoConfig.logLevel) {
+      io.set('log level', socketIoConfig.logLevel);
     }
   }
 
@@ -146,7 +155,7 @@ db.on('open', function ( ) {
     Plugin.instance = new Plugin(app, server, config);
 
     var channel = null, channelUuid;
-    if (socketioConfig.enabled) {
+    if (socketIoConfig.enabled) {
       channelUuid = Plugin.packageMeta.pulsar.socketio.channelUuid;
       channel = io.of('/'+channelUuid);
       app.channels.push({
@@ -156,6 +165,7 @@ db.on('open', function ( ) {
       });
     }
     Plugin.instance.start(channel);
+    // Plugin.instance.stop(); // here for testing to make sure plugins *can* stop
   });
 
   app.log.info('Pulsar online with', app.plugins.length, 'plugins and', app.channels.length, 'socket.io channels');
