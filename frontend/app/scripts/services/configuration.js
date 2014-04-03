@@ -12,14 +12,15 @@ angular.module('robcolbertApp')
     var feServer = {
       'scheme': 'http://',
       //'host': 'localhost'
-      'host': 'robcolbert.com'
+      'host': 'localhost',
+      'port': 9999
     };
     this.getFrontEndHost = function ( ) { return feServer.host; };
 
     var apiServer = {
       'scheme': 'http://',
       //'host': '127.0.0.1',
-      'host': 'api.robcolbert.com',
+      'host': 'localhost',
       'port': 10010
     };
 

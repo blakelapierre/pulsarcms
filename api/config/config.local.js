@@ -25,14 +25,14 @@ module.exports = exports = {
   'userPasswordSalt': 'CREATE A UNIQUE PASSWORD SALT',  // suggested: Use a UUID
   'cookieSecret': 'CREATE A UNIQUE COOKIE SECRET',      // suggested: Use a UUID
 
-  'frontEnd': 'http://robcolbert.com',
+  'frontEnd': 'http://localhost:9999',
   'bind': {
     'address': '0.0.0.0',
     'port': 10010
   },
 
   'corsOptions': {
-    'allowOrigins': [ 'http://127.0.0.1:9000' ],
+    'allowOrigins': [ 'http://localhost:9999' ],
     'allowMethods': [ 'GET', 'PUT', 'POST', 'DELETE' ],
     'allowHeaders': [ 'Content-Type', 'Authorization' ],
     'allowCredentials': true
@@ -52,7 +52,7 @@ module.exports = exports = {
   'socketIo': {
     'enabled'    : true,
     'logLevel'   : SocketIoLogLevels.WARN,
-    'allowOrigin': 'http://127.0.0.1:9000',
+    'allowOrigin': 'http://localhost:9999',
     'client': {
       'minify': true,
       'etag': true,
