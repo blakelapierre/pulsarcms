@@ -270,62 +270,6 @@ PulseWire.prototype.injectConversationsRoutes = function ( ) {
     'uri': serviceUrl,
     'controllerMethod': function (req, res) { conversations.deleteMessage(req, res); }
   });
-
-  var services = {
-    '/conversations': {
-      'POST': conversations.create,
-      'GET': conversations.list
-    },
-    '/conversations/:conversationId': {
-      'POST': conversations.get,
-      'PUT': conversations.update
-    },
-    '/conversations/:conversationId/members': {
-      'POST': conversations.addParticipant,
-      'GET': conversations.listParticipants
-    },
-    /*
-     * INDIVIDUAL USER
-     */
-    '/conversations/:conversationId/members/:userId': {
-      'GET': conversations.getParticipant,
-      'DELETE': conversations.removeParticipant
-    },
-    /*
-     * INDIVIDUAL MEMBER'S MESSAGES COLLECTION
-     */
-    '/conversations/:conversationId/members/:userId/messages': {
-      'GET': conversations.listParticipantMessages
-    },
-    /*
-     * MESSAGES COLLECTION
-     */
-    '/conversations/:conversationId/messages': {
-      'POST': conversations.createMessage,
-      'GET': conversations.listMessages
-    },
-    /*
-     * INDIVIDUAL MESSAGES
-     */
-    '/conversations/:conversationId/messages/:messageId': {
-      'GET': conversations.getMessage,
-      'PUT': conversations.updateMessage,
-      'DELETE': conversations.deleteMessage
-    }
-  };
-
-  for (var serviceEndpoint in services) {
-    var serviceUrl = PulseWire.buildServiceUrl(serviceEndpoint);
-    var serviceDefinition = services[serviceUrl];
-    for (var method in serviceDefinition) {
-      var service = serviceDefinition[method];
-      self.routeAssembler.add({
-        'method': method,
-        'uri': serviceUrl,
-        'controllerMethod': service
-      });
-    } 
-  }
 };
 
 /*
