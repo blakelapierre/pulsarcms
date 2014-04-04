@@ -155,10 +155,121 @@ PulseWire.prototype.injectSessionRoutes = function ( ) {
 
 PulseWire.prototype.injectConversationsRoutes = function ( ) {
   var self = this;
+  var serviceUrl;
 
   var ConversationsController = require('./server/controllers/conversations');
   var conversations = new ConversationsController(self);
   var routeAssembler = new RouteAssembler(self.app, self.config);
+
+  serviceUrl = PulseWire.buildServiceUrl(
+    '/conversations'
+  );
+  self.routeAssembler.add({
+    'method': 'POST',
+    'uri': serviceUrl,
+    'controllerMethod': function (req, res) { conversations.createConversation(req, res); }
+  });
+  self.routeAssembler.add({
+    'method': 'GET',
+    'uri': serviceUrl,
+    'controllerMethod': function (req, res) { conversations.listConversations(req, res); }
+  });
+
+  serviceUrl = PulseWire.buildServiceUrl(
+    '/conversations/:conversationId'
+  );
+  self.routeAssembler.add({
+    'method': 'GET',
+    'uri': serviceUrl,
+    'controllerMethod': function (req, res) { conversations.getConversation(req, res); }
+  });
+  self.routeAssembler.add({
+    'method': 'PUT',
+    'uri': serviceUrl,
+    'controllerMethod': function (req, res) { conversations.updateConversation(req, res); }
+  });
+
+  serviceUrl = PulseWire.buildServiceUrl(
+    '/conversations/:conversationId/members'
+  );
+  self.routeAssembler.add({
+    'method': 'POST',
+    'uri': serviceUrl,
+    'controllerMethod': function (req, res) { conversations.addMember(req, res); }
+  });
+  self.routeAssembler.add({
+    'method': 'GET',
+    'uri': serviceUrl,
+    'controllerMethod': function (req, res) { conversations.listMembers(req, res); }
+  });
+
+  /*
+   * INDIVIDUAL USER
+   */
+  serviceUrl = PulseWire.buildServiceUrl(
+    '/conversations/:conversationId/members/:userId'
+  );
+  self.routeAssembler.add({
+    'method': 'GET',
+    'uri': serviceUrl,
+    'controllerMethod': function (req, res) { conversations.getMember(req, res); }
+  });
+  self.routeAssembler.add({
+    'method': 'DELETE',
+    'uri': serviceUrl,
+    'controllerMethod': function (req, res) { conversations.deleteMember(req, res); }
+  });
+
+  /*
+   * INDIVIDUAL MEMBER'S MESSAGES COLLECTION
+   */
+  serviceUrl = PulseWire.buildServiceUrl(
+    '/conversations/:conversationId/members/:userId/messages'
+  );
+  self.routeAssembler.add({
+    'method': 'GET',
+    'uri': serviceUrl,
+    'controllerMethod': function (req, res) { conversations.listMemberMessages(req, res); }
+  });
+
+  /*
+   * MESSAGES COLLECTION
+   */
+  serviceUrl = PulseWire.buildServiceUrl(
+    '/conversations/:conversationId/messages'
+  );
+  self.routeAssembler.add({
+    'method': 'POST',
+    'uri': serviceUrl,
+    'controllerMethod': function (req, res) { conversations.createMessage(req, res); }
+  });
+  self.routeAssembler.add({
+    'method': 'GET',
+    'uri': serviceUrl,
+    'controllerMethod': function (req, res) { conversations.listMessages(req, res); }
+  });
+
+  /*
+   * INDIVIDUAL MESSAGES
+   */
+  serviceUrl = PulseWire.buildServiceUrl(
+    '/conversations/:conversationId/messages/:messageId'
+  );
+  self.routeAssembler.add({
+    'method': 'GET',
+    'uri': serviceUrl,
+    'controllerMethod': function (req, res) { conversations.getMessage(req, res); }
+  });
+  self.routeAssembler.add({
+    'method': 'PUT',
+    'uri': serviceUrl,
+    'controllerMethod': function (req, res) { conversations.updateMessage(req, res); }
+  });
+  self.routeAssembler.add({
+    'method': 'DELETE',
+    'uri': serviceUrl,
+    'controllerMethod': function (req, res) { conversations.deleteMessage(req, res); }
+  });
 
   var services = {
     '/conversations': {
