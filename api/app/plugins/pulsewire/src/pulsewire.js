@@ -232,10 +232,11 @@ PulseWire.prototype.injectConversationsRoutes = function ( ) {
     var methods = serviceDefinition.methods;
     for (var method in methods) {
       var service = methods[method];
-      routeAssembler.add({
+
+      self.routeAssembler.add({
         'method': method.toUpperCase(),
         'uri': serviceUrl,
-        'controllerMethod': service
+        'controllerMethod': (function(service) { return function() { service.apply(conversations, arguments); }; })(service)
       });
     } 
   }
