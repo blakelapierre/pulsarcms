@@ -158,88 +158,99 @@ PulseWire.prototype.injectConversationsRoutes = function ( ) {
   var serviceUrl;
 
   var ConversationsController = require('./server/controllers/conversations');
-  var conversations = new ConversationsController(self);
-  var routeAssembler = new RouteAssembler(self.app, self.config);
 
-  var services = [
-    {
-      'url': '/conversations',
-      'methods': {
-        'post': conversations.createConversation,
-        'get': conversations.listConversations
-      }
-    },
-    {
-      'url': '/conversations/:conversationId',
-      'methods': {
-        'post': conversations.getConversation,
-        'put': conversations.updateConversation
-      }
-    },
-    {
-      'url': '/conversations/:conversationId/members',
-      'methods': {
-        // 'post': conversations.addParticipant,
-        // 'get': conversations.listParticipants
-      }
-    },
-    {
-    /*
-     * INDIVIDUAL USER
-     */
-      'url': '/conversations/:conversationId/members/:userId',
-      'methods': {
-        // 'get': conversations.getParticipant,
-        // 'delete': conversations.removeParticipant
-      }
-    },
-    {
-    /*
-     * INDIVIDUAL MEMBER'S MESSAGES COLLECTION
-     */
-      'url': '/conversations/:conversationId/members/:userId/messages',
-      'methods': {
-        // 'get': conversations.listParticipantMessages
-      }
-    },
-    {
-    /*
-     * MESSAGES COLLECTION
-     */
-      'url': '/conversations/:conversationId/messages',
-      'methods': {
-        'post': conversations.createMessage,
-        'get': conversations.listMessages
-      }
-    },
-    {
-    /*
-     * INDIVIDUAL MESSAGES
-     */
-      'url': '/conversations/:conversationId/messages/:messageId',
-      'methods': {
-        'get': conversations.getConversationMessage,
-        // 'put': conversations.updateMessage,
-        // 'delete': conversations.deleteMessage
-      }
-    }
-  ];
+  var servicesDefinition = (function() {
+    var injectRoute = function(endpoint, method, controller, controllerFunctionName) {
+      var fn = controller[controllerFunctionName];
 
-  for (var i = 0; i < services.length; i++) {
-    var serviceDefinition = services[i];
-    var serviceUrl = PulseWire.buildServiceUrl(serviceDefinition.url);
-
-    var methods = serviceDefinition.methods;
-    for (var method in methods) {
-      var service = methods[method];
+      console.log('Injecting', endpoint, 'method', method);
+      if (fn == null) throw new Error('Couldn\'t find ' + controllerFunctionName);
 
       self.routeAssembler.add({
         'method': method.toUpperCase(),
-        'uri': serviceUrl,
-        'controllerMethod': (function(service) { return function() { service.apply(conversations, arguments); }; })(service)
+        'uri': PulseWire.buildServiceUrl(endpoint),
+        'controllerMethod': function() { fn.apply(controller, arguments); }
       });
-    } 
-  }
+    };
+
+    var fullPath = [];
+    return function(controller, config) {
+      for (var key in config) {
+        var value = config[key];
+
+        switch (key) {
+          case '_comment':
+            break;
+          case 'post':
+          case 'get':
+          case 'put':
+          case 'delete':
+            injectRoute(fullPath.join(''), key, controller, value);
+            break;
+          default:
+            fullPath.push(key);
+            servicesDefinition(controller, value);
+            fullPath.pop();
+        }
+      }
+    };
+  })();
+
+  var services = servicesDefinition(new ConversationsController(self), {
+    '/conversations': {
+      'post': 'createConversation',
+      'get': 'listConversations',
+
+      '/:conversationId': {
+        'post': 'getConversation',
+        'put': 'updateConversation',
+
+        '/members': {
+          // 'post': 'addParticipant',
+          // 'get': 'listParticipants',
+
+          '/:userId': {
+            '_comment': 
+              '/*\
+                * INDIVIDUAL USER\
+                */',
+
+            // 'get': 'getParticipant',
+            // 'delete': 'removeParticipant',
+
+            '/messages': {
+              '_comment': 
+                '/*\
+                  * INDIVIDUAL MEMBER\'S MESSAGES COLLECTION\
+                  */',
+              // 'get': 'listParticipantMessages'
+            },
+          }
+        },
+
+        '/messages': {
+          '_comment': 
+            '/*\
+              * MESSAGES COLLECTION\
+              */',
+
+          'post': 'createMessage',
+          'get': 'listMessages',
+
+          '/:messageId': {
+            '_comment':
+              '/*\
+                * INDIVIDUAL MESSAGES\
+                */',
+
+            'get': 'getConversationMessage',
+            // 'put': 'updateMessage',
+            // 'delete': 'deleteMessage'
+          }
+        }
+      }
+    }
+  });
 };
 
 /*
