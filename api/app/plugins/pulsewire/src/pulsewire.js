@@ -154,8 +154,8 @@ PulseWire.prototype.injectSessionRoutes = function ( ) {
 };
 
 PulseWire.prototype.injectConversationsRoutes = function ( ) {
-  var self = this;
-  var serviceUrl;
+  var self = this,
+      log = self.log;
 
   var ConversationsController = require('./server/controllers/conversations');
 
@@ -163,7 +163,7 @@ PulseWire.prototype.injectConversationsRoutes = function ( ) {
     var injectRoute = function(endpoint, method, controller, controllerFunctionName) {
       var fn = controller[controllerFunctionName];
 
-      console.log('Injecting', endpoint, 'method', method);
+      log.info('< Injecting', endpoint, 'method', method);
       if (fn == null) throw new Error('Couldn\'t find ' + controllerFunctionName);
 
       self.routeAssembler.add({
