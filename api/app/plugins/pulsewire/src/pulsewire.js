@@ -97,11 +97,111 @@ function PulseWire (app, http, config) {
     self.loadBalancer.addHost(host);
   });
 
+
   /*
    * MODELS
    */
   require('./server/models/conversations');
 
+  var log = self.log;
+
+  var servicesDefinition = (function() {
+    var injectRoute = function(endpoint, method, controller, controllerFunctionName) {
+      log.info('< Injecting', endpoint, 'method', method);
+
+      var fn = controller[controllerFunctionName];
+
+      if (fn == null) throw new Error('Couldn\'t find ' + controllerFunctionName);
+
+      self.routeAssembler.add({
+        'method': method.toUpperCase(),
+        'uri': PulseWire.buildServiceUrl(endpoint),
+        'controllerMethod': function() { fn.apply(controller, arguments); }
+      });
+    };
+
+    var fullPath = [];
+    return function(controller, config) {
+      for (var key in config) {
+        var value = config[key];
+
+        switch (key) {
+          case '_comment':
+            break;
+          case 'post':
+          case 'get':
+          case 'put':
+          case 'delete':
+            injectRoute(fullPath.join(''), key, controller, value);
+            break;
+          default:
+            fullPath.push(key);
+            servicesDefinition(controller, value);
+            fullPath.pop();
+        }
+      }
+    };
+  })();
+
+  self.injectConversationsRoutes = function () {
+    var ConversationsController = require('./server/controllers/conversations');
+
+    var services = servicesDefinition(new ConversationsController(self), {
+      '/conversations': {
+        'post': 'createConversation',
+        'get': 'listConversations',
+
+        '/:conversationId': {
+          'post': 'getConversation',
+          'put': 'updateConversation',
+
+          '/members': {
+            // 'post': 'addParticipant',
+            // 'get': 'listParticipants',
+
+            '/:userId': {
+              '_comment': 
+                '/*\
+                  * INDIVIDUAL USER\
+                  */',
+
+              // 'get': 'getParticipant',
+              // 'delete': 'removeParticipant',
+
+              '/messages': {
+                '_comment': 
+                  '/*\
+                    * INDIVIDUAL MEMBER\'S MESSAGES COLLECTION\
+                    */',
+                // 'get': 'listParticipantMessages'
+              },
+            }
+          },
+
+          '/messages': {
+            '_comment': 
+              '/*\
+                * MESSAGES COLLECTION\
+                */',
+
+            'post': 'createMessage',
+            'get': 'listMessages',
+
+            '/:messageId': {
+              '_comment':
+                '/*\
+                  * INDIVIDUAL MESSAGES\
+                  */',
+
+              'get': 'getConversationMessage',
+              // 'put': 'updateMessage',
+              // 'delete': 'deleteMessage'
+            }
+          }
+        }
+      }
+    });
+  }
 }
 
 /*
@@ -150,106 +250,6 @@ PulseWire.prototype.injectSessionRoutes = function ( ) {
     'method': 'GET',
     'uri': serviceUrl,
     'controllerMethod': function (req, res) { return self.getUserSession(req, res); }
-  });
-};
-
-PulseWire.prototype.injectConversationsRoutes = function ( ) {
-  var self = this,
-      log = self.log;
-
-  var ConversationsController = require('./server/controllers/conversations');
-
-  var servicesDefinition = (function() {
-    var injectRoute = function(endpoint, method, controller, controllerFunctionName) {
-      var fn = controller[controllerFunctionName];
-
-      log.info('< Injecting', endpoint, 'method', method);
-      if (fn == null) throw new Error('Couldn\'t find ' + controllerFunctionName);
-
-      self.routeAssembler.add({
-        'method': method.toUpperCase(),
-        'uri': PulseWire.buildServiceUrl(endpoint),
-        'controllerMethod': function() { fn.apply(controller, arguments); }
-      });
-    };
-
-    var fullPath = [];
-    return function(controller, config) {
-      for (var key in config) {
-        var value = config[key];
-
-        switch (key) {
-          case '_comment':
-            break;
-          case 'post':
-          case 'get':
-          case 'put':
-          case 'delete':
-            injectRoute(fullPath.join(''), key, controller, value);
-            break;
-          default:
-            fullPath.push(key);
-            servicesDefinition(controller, value);
-            fullPath.pop();
-        }
-      }
-    };
-  })();
-
-  var services = servicesDefinition(new ConversationsController(self), {
-    '/conversations': {
-      'post': 'createConversation',
-      'get': 'listConversations',
-
-      '/:conversationId': {
-        'post': 'getConversation',
-        'put': 'updateConversation',
-
-        '/members': {
-          // 'post': 'addParticipant',
-          // 'get': 'listParticipants',
-
-          '/:userId': {
-            '_comment': 
-              '/*\
-                * INDIVIDUAL USER\
-                */',
-
-            // 'get': 'getParticipant',
-            // 'delete': 'removeParticipant',
-
-            '/messages': {
-              '_comment': 
-                '/*\
-                  * INDIVIDUAL MEMBER\'S MESSAGES COLLECTION\
-                  */',
-              // 'get': 'listParticipantMessages'
-            },
-          }
-        },
-
-        '/messages': {
-          '_comment': 
-            '/*\
-              * MESSAGES COLLECTION\
-              */',
-
-          'post': 'createMessage',
-          'get': 'listMessages',
-
-          '/:messageId': {
-            '_comment':
-              '/*\
-                * INDIVIDUAL MESSAGES\
-                */',
-
-            'get': 'getConversationMessage',
-            // 'put': 'updateMessage',
-            // 'delete': 'deleteMessage'
-          }
-        }
-      }
-    }
   });
 };
 
