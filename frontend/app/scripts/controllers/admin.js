@@ -38,5 +38,5 @@ AdminCtrl.$inject = [
   'Configuration'
 ];
 
-angular.module('robcolbertApp')
+angular.module('pulsarClientApp')
 .controller('AdminCtrl', AdminCtrl);

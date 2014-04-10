@@ -17,5 +17,5 @@ AboutCtrl.$inject = [
   'PresentationEngine'
 ];
 
-angular.module('robcolbertApp')
+angular.module('pulsarClientApp')
 .controller('AboutCtrl', AboutCtrl);

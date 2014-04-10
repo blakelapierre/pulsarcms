@@ -21,7 +21,6 @@ function UserSession($rootScope, $location, Sessions) {
   self.error = null;
 
   self.$rootScope.$on('setUserSession', function (event, userSession) {
-    console.log('USER SESSION', userSession);
     self.session = userSession;
     if (!angular.isDefined(self.session.authenticated)) {
       self.session.authenticated = { 'status': false };
@@ -48,6 +47,43 @@ function UserSession($rootScope, $location, Sessions) {
     return false;
   };
 
+  self.login = function (parameters) {
+    var successHandler = function ( ) { };
+    var errorHandler = function ( ) { };
+    var thenHandler = function ( ) { };
+
+    Sessions.create(
+      parameters,
+      function onSessionCreateSuccess (session) {
+        ga('send','event','Authentication','userLoginSuccess',1);
+        $rootScope.$broadcast('setUserSession', session);
+        successHandler(session);
+      },
+      function onSessionCreateError (error) {
+        console.log('Sessions.create error', error);
+        ga('send','event','Authentication','userLoginError', 1);
+        errorHandler(error);
+      }
+    );
+
+    var promise = {
+      'success': function setSuccessHandler (handler) {
+        successHandler = handler;
+        return promise;
+      },
+      'error': function setErrorHandler (handler) {
+        errorHandler = handler;
+        return promise;
+      },
+      'then': function setThenHandler (handler) {
+        thenHandler = handler;
+        return promise;
+      }
+    };
+
+    return promise;
+  };
+
   self.logout = function ( ) {
     ga('send', 'event', 'Authentication', 'logout', 1);
     Sessions.delete(function ( ) {
@@ -58,12 +94,10 @@ function UserSession($rootScope, $location, Sessions) {
   ga('send', 'event', 'Authentication', 'fetchSession', 1);
   Sessions.get(
     function onSessionGetSuccess (session) {
-      console.log('user session created');
       ga('send', 'event', 'Authentication', 'fetchSessionSuccess', 1);
       $rootScope.$broadcast('setUserSession', session);
     },
     function onSessionsGetError (error) {
-      console.log('user session create/fetch failed', error);
       ga('send', 'event', 'Authentication', 'sessionGetError', 1);
       self.haveError = true;
       self.error = error;
@@ -85,5 +119,5 @@ UserSession.$inject = [
 // AngularJS service module registration
 //
 
-angular.module('robcolbertApp')
+angular.module('pulsarClientApp')
 .service('UserSession', UserSession);

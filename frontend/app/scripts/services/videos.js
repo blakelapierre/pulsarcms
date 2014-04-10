@@ -21,4 +21,4 @@ VideosService.$inject = [
   'Configuration'
 ];
 
-angular.module('robcolbertApp').service('Videos', VideosService);
+angular.module('pulsarClientApp').service('Videos', VideosService);

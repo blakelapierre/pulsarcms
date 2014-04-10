@@ -43,6 +43,7 @@ PulseWire.prototype.connect = function ( ) {
   var self = this;
 
   if (!angular.isDefined(window.io)) {
+    console.log('socket.io support is not enabled');
     return;
   }
 
@@ -50,13 +51,9 @@ PulseWire.prototype.connect = function ( ) {
   self.pulsewireSessions.create(
     null,
     function onSessionCreateSuccess (session) {
-      console.log('PulseWire user session', session);
-
       self.session = session;
       self.session.connected = false;
-
       self.session.channelUrl = 'http://'+session.host.address.toString()+':'+session.host.port.toString()+'/'+session.channel;
-      console.log('socket.io connecting to', self.session);
       self.socket = io.connect(self.session.channelUrl);
       self.attach();
     },
@@ -115,5 +112,5 @@ PulseWire.$inject = [
   'UserSession'
 ];
 
-angular.module('robcolbertApp')
+angular.module('pulsarClientApp')
 .service('PulseWire', PulseWire);

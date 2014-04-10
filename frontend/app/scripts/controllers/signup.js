@@ -122,5 +122,5 @@ SignupCtrl.$inject = [
   'Users'
 ];
 
-angular.module('robcolbertApp')
+angular.module('pulsarClientApp')
 .controller('SignupCtrl', SignupCtrl);

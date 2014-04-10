@@ -4,7 +4,7 @@
 
 'use strict';
 
-angular.module('robcolbertApp')
+angular.module('pulsarClientApp')
 .controller('VideosCtrl', [
   '$window',
   '$scope',
