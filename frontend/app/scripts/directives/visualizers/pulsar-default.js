@@ -170,7 +170,7 @@ function PulsarCanvasThreejsDirective ( ) {
       }
 
       var posZ = 0;
-      scope.updateVisualizer3d = function (specRatio, bassRatio, midsRatio, trebRatio) {
+      scope.updateVisualizer3d = function (specRatio, bassRatio, midsRatio, trebRatio, bassStd, midsStd, trebStd) {
         if (scope.pulsar === null) {
           return;
         }
@@ -212,17 +212,27 @@ function PulsarCanvasThreejsDirective ( ) {
         var outerCoreScale = 1.0 + Math.max(bassRatio, Math.max(midsRatio, trebRatio));
         scope.pulsarOuterLayer.scale.set(outerCoreScale, outerCoreScale, outerCoreScale);
 
+        var yScale = bassStd / 30;
+        yScale = yScale * yScale;
         scope.materialBass.emissive.setRGB(bassRatio, 0, 0);
-        scope.rayBass1.scale.y = bassRatio;
-        scope.rayBass2.scale.y = bassRatio;
+        scope.rayBass1.scale.y = yScale;
+        scope.rayBass2.scale.y = yScale;
+        scope.rayBass1.scale.x = bassRatio;
+        scope.rayBass2.scale.x = bassRatio;
 
+        var yScale = midsStd / 20;
+        yScale = yScale * yScale;
         scope.materialMids.emissive.setRGB(0, midsRatio, 0);
-        scope.rayMids1.scale.y = midsRatio;
-        scope.rayMids2.scale.y = midsRatio;
+        scope.rayMids1.scale.y = yScale;
+        scope.rayMids2.scale.y = yScale;
 
+        var yScale = trebStd / 200;
+        yScale = yScale * yScale;
         scope.materialTreb.emissive.setRGB(0, 0, trebRatio);
-        scope.rayTreb1.scale.y = trebRatio;
-        scope.rayTreb2.scale.y = trebRatio;
+        scope.rayTreb1.scale.y = yScale;
+        scope.rayTreb2.scale.y = yScale;
+        scope.rayTreb1.scale.x = trebRatio;
+        scope.rayTreb2.scale.x = trebRatio;
 
         scope.renderer.render(scope.scene, scope.camera);
       };

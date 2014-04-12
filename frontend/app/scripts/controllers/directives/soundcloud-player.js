@@ -139,6 +139,10 @@ function PulsarSoundCloudPlayerCtrl ($element, $scope, $interval, WebAudio, Soun
     var midsAvg = 0.0;
     var trebAvg = 0.0;
 
+    var bassSquare = 0.0;
+    var midsSquare = 0.0;
+    var trebSquare = 0.0;
+
     function renderFrequencyBar (x, power) {
       var barH = graphH * (WebAudio.freqByteData[idx] / 256.0);
       ctx.fillRect(idx, graphH, 1, -barH);
@@ -153,6 +157,7 @@ function PulsarSoundCloudPlayerCtrl ($element, $scope, $interval, WebAudio, Soun
     for ( ; idx < bassCutoff; ++idx) {
       power = WebAudio.freqByteData[idx];
       bassAvg += power;
+      bassSquare = power * power;
       renderFrequencyBar(idx, power);
     }
     bassAvg = parseInt(bassAvg / bassCutoff);
@@ -161,6 +166,7 @@ function PulsarSoundCloudPlayerCtrl ($element, $scope, $interval, WebAudio, Soun
     for ( ; idx < midsCutoff; ++idx) {
       power = WebAudio.freqByteData[idx];
       midsAvg += power;
+      midsSquare = power * power;
       renderFrequencyBar(idx, power);
     }
     midsAvg = parseInt(midsAvg / (midsCutoff - bassCutoff));
@@ -169,6 +175,7 @@ function PulsarSoundCloudPlayerCtrl ($element, $scope, $interval, WebAudio, Soun
     for ( ; idx < trebCutoff; ++idx) {
       power = WebAudio.freqByteData[idx];
       trebAvg += power;
+      trebSquare += power * power;
       renderFrequencyBar(idx, power);
     }
     trebAvg = parseInt(trebAvg / (trebCutoff - midsCutoff));
@@ -179,7 +186,17 @@ function PulsarSoundCloudPlayerCtrl ($element, $scope, $interval, WebAudio, Soun
     var midsRatio = midsAvg / 255.0;
     var trebRatio = trebAvg / 255.0;
     var specRatio = (bassRatio + midsRatio + trebRatio) / 3.0;
-    $scope.updateVisualizer3d(specRatio, bassRatio, midsRatio, trebRatio);
+
+    var bassRange = bassCutoff,
+        bassMean = bassAvg / bassRange,
+        bassStd = Math.sqrt((bassSquare / bassRange) - (bassMean * bassMean)),
+        midsRange = midsCutoff - bassCutoff,
+        midsMean = midsAvg / midsRange,
+        midsStd = Math.sqrt((midsSquare / midsRange) - (midsMean * midsMean)),
+        trebRange = trebCutoff - midsCutoff,
+        trebMean = trebAvg / trebRange;
+    var trebStd = Math.sqrt((trebSquare / trebRange) - (trebMean * trebMean));
+    $scope.updateVisualizer3d(specRatio, bassRatio, midsRatio, trebRatio, bassStd, midsStd, trebStd);
 
     if (!PresentationEngine.isFullscreen()) {
       player.css('background-color', audioColor);
