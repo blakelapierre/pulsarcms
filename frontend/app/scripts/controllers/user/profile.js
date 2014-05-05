@@ -118,7 +118,7 @@ function UserProfileCtrl ($scope, $route, $location, $window, $sce, UserSession,
   };
 
   $scope.removePhoto = function ( ) {
-
+    $scope.user.photoUrl = 'images/profile-default.png';
   };
 
   $scope.$watch('user.droppedPhoto', function(droppedPhoto) {
