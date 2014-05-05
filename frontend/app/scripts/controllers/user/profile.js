@@ -4,7 +4,7 @@
 
 'use strict';
 
-function UserProfileCtrl ($scope, $route, $location, $window, $sce, UserSession, Users, Pulses) {
+function UserProfileCtrl ($scope, $route, $location, $window, $sce, UserSession, Users, Pulses, Files) {
 
   $window.scrollTo(0, 0);
   $scope.haveError = false;
@@ -109,8 +109,20 @@ function UserProfileCtrl ($scope, $route, $location, $window, $sce, UserSession,
   }
   $scope.loadPulses();
 
-  $scope.$watch('user.droppedFile', function(droppedFile) {
-    if (droppedFile) $scope.user.photoUrl = URL.createObjectURL(droppedFile);
+  $scope.changePhoto = function ( ) {
+    Files.promptForFile(
+      function onPromptForFileSuccess (file) {
+        $scope.user.photoUrl = URL.createObjectURL(file);
+      }
+    );
+  };
+
+  $scope.removePhoto = function ( ) {
+
+  };
+
+  $scope.$watch('user.droppedPhoto', function(droppedPhoto) {
+    if (droppedPhoto) $scope.user.photoUrl = URL.createObjectURL(droppedPhoto);
   });
 }
 
@@ -122,7 +134,8 @@ UserProfileCtrl.$inject = [
   '$sce',
   'UserSession',
   'Users',
-  'Pulses'
+  'Pulses',
+  'Files'
 ];
 
 angular.module('pulsarClientApp')
