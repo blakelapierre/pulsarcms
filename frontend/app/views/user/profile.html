@@ -30,7 +30,7 @@
         <div class="col-sm-4">
 
           <div class="profile-photo-wrap" file-drop-area="user.droppedPhoto" file-drop-area-type="image/*">
-            <img class="profile-photo" ng-src="{{user.photoUrl}}" />
+            <img class="profile-photo" ng-src="{{user.photoUrl}}" title="{{user.displayName}}" />
             <!-- img class="profile-photo" src="images/rob-profile-dark.jpg" title="{{user.displayName}}" / -->
             <div class="profile-photo-menu">
               <button class="btn btn-sm btn-primary" ng-click="changePhoto()">Change Photo</button>
