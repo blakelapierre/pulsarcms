@@ -132,6 +132,14 @@ function UserProfileCtrl ($scope, $route, $location, $window, $sce, UserSession,
     $scope.user.photoUrl = 'images/profile-default.png';
   };
 
+  $scope.setCurrentPhoto = function (url) {
+    $scope.user.photoUrl = url;
+
+    // This should probably be taken out of this method (or the method should be named better)
+    $scope.historicalPhotoVisible = false;
+    $scope.photoHistoryVisible = false;
+  };
+
   $scope.viewPhotoHistory = function ( ) {
     $scope.photoHistoryVisible = true;
   };
