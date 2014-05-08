@@ -132,6 +132,10 @@ function UserProfileCtrl ($scope, $route, $location, $window, $sce, UserSession,
     $scope.user.photoUrl = 'images/profile-default.png';
   };
 
+  $scope.viewPhotoHistory = function ( ) {
+    $scope.photoHistoryVisible = true;
+  };
+
   $scope.showHistoricalPhoto = function (photo) {
     $scope.historicalPhotoUrl = photo.src;
     $scope.historicalPhotoVisible = true;
