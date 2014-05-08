@@ -18,6 +18,7 @@ function UserProfileCtrl ($scope, $route, $location, $window, $sce, UserSession,
     return moment(date).fromNow(format);
   };
 
+  // This should be moved out into a directive
   angular.element('.profile-photo-wrap').hover(
     function ( ) {
       angular.element(this).find('.profile-photo-menu').addClass('visible');
@@ -41,6 +42,7 @@ function UserProfileCtrl ($scope, $route, $location, $window, $sce, UserSession,
     function onGetUserSuccess (user) {
       $scope.haveError = false;
       $scope.isMyProfile = ($scope.session.authenticated.status && (user._id === $scope.session.user._id));
+      user.historicalPhotos = []; // Should this be moved into the Users model?
       user.photoUrl = 'images/profile-default.png';
       console.log('Users.get', user);
     },
@@ -112,7 +114,16 @@ function UserProfileCtrl ($scope, $route, $location, $window, $sce, UserSession,
   $scope.changePhoto = function ( ) {
     Files.promptForFile(
       function onPromptForFileSuccess (file) {
-        $scope.user.photoUrl = URL.createObjectURL(file);
+        var url = URL.createObjectURL(file);
+
+        if ($scope.user.photoUrl) {
+          $scope.user.historicalPhotos.push({
+            src: url
+          });
+        }
+
+        $scope.user.photoUrl = url;
+        $scope.$digest();
       }
     );
   };
@@ -121,8 +132,9 @@ function UserProfileCtrl ($scope, $route, $location, $window, $sce, UserSession,
     $scope.user.photoUrl = 'images/profile-default.png';
   };
 
-  $scope.viewPhotoHistory = function ( ) {
-    // Stub
+  $scope.showHistoricalPhoto = function (photo) {
+    $scope.historicalPhotoUrl = photo.src;
+    $scope.historicalPhotoVisible = true;
   };
 
   $scope.$watch('user.droppedPhoto', function(droppedPhoto) {
