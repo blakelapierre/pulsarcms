@@ -121,6 +121,10 @@ function UserProfileCtrl ($scope, $route, $location, $window, $sce, UserSession,
     $scope.user.photoUrl = 'images/profile-default.png';
   };
 
+  $scope.viewPhotoHistory = function ( ) {
+    // Stub
+  };
+
   $scope.$watch('user.droppedPhoto', function(droppedPhoto) {
     if (droppedPhoto) $scope.user.photoUrl = URL.createObjectURL(droppedPhoto);
   });
