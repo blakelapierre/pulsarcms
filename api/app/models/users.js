@@ -76,6 +76,14 @@ var UsersSchema = new mongoose.Schema({
   'tagline': { 'type': String, 'required': false },
   'about': { 'type': String, 'required': false },
   'website': { 'type': String, 'required': false },
+  'photo': {
+    'src': { 'type': String, 'required': false, 'default': 'images/profile-default.png' },
+    'setAt': { 'type': Date, 'required': false },
+    'history': [{
+      'src': { 'type': String, 'required': false },
+      'setAt': { 'type': Date, 'required': false }
+    }]
+  },
   'contacts': [{
     'contactId': { 'type': mongoose.Schema.Types.ObjectId, 'required': true, 'ref': 'Users' },
     'connected': { 'type': Date, 'default': Date.now },

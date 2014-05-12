@@ -30,7 +30,7 @@
         <div class="col-sm-4">
 
           <div class="profile-photo-wrap" file-drop-area="user.droppedPhoto" file-drop-area-type="image/*">
-            <img class="profile-photo" ng-src="{{user.photoUrl}}" title="{{user.displayName}}" />
+            <img class="profile-photo" ng-src="{{user.photo.src}}" title="{{user.displayName}}" />
             <!-- img class="profile-photo" src="images/rob-profile-dark.jpg" title="{{user.displayName}}" / -->
             <div class="profile-photo-menu">
               <button class="btn btn-sm btn-primary" ng-click="changePhoto()">Change Photo</button>
@@ -39,7 +39,7 @@
             </div>
             <div ng-show="photoHistoryVisible" class="profile-photo-history">
               <button class="btn btn-sm btn-default" ng-click="photoHistoryVisible = false"><span class="glyphicon glyphicon-arrow-left"></span>Back</button>
-              <img ng-repeat="photo in user.historicalPhotos track by $index" class="profile-history-photo" src="{{photo.src}}" ng-click="showHistoricalPhoto(photo)" />
+              <img ng-repeat="photo in user.photo.history track by $index" class="profile-history-photo" src="{{photo.src}}" ng-click="showHistoricalPhoto(photo)" />
             </div>
             <div ng-show="historicalPhotoVisible" class="profile-photo-historical-photo">
               <img src="{{historicalPhotoUrl}}" />

@@ -42,8 +42,6 @@ function UserProfileCtrl ($scope, $route, $location, $window, $sce, UserSession,
     function onGetUserSuccess (user) {
       $scope.haveError = false;
       $scope.isMyProfile = ($scope.session.authenticated.status && (user._id === $scope.session.user._id));
-      user.historicalPhotos = []; // Should this be moved into the Users model?
-      user.photoUrl = 'images/profile-default.png';
       console.log('Users.get', user);
     },
     function onGetUserError (error) {
@@ -116,24 +114,26 @@ function UserProfileCtrl ($scope, $route, $location, $window, $sce, UserSession,
       function onPromptForFileSuccess (file) {
         var url = URL.createObjectURL(file);
 
-        if ($scope.user.photoUrl) {
-          $scope.user.historicalPhotos.push({
-            src: url
+        if ($scope.user.photo.src) {
+          $scope.user.photo.history.push({
+            src: url,
+            setAt: $scope.user.photo.setAt
           });
         }
 
-        $scope.user.photoUrl = url;
+        $scope.user.photo.src = url;
         $scope.$digest();
       }
     );
   };
 
   $scope.removePhoto = function ( ) {
-    $scope.user.photoUrl = 'images/profile-default.png';
+    $scope.user.photo.src = 'images/profile-default.png';
   };
 
   $scope.setCurrentPhoto = function (url) {
-    $scope.user.photoUrl = url;
+    $scope.user.photo.src = url;
+    $scope.user.photo.setAt = new Date();
 
     // This should probably be taken out of this method (or the method should be named better)
     $scope.historicalPhotoVisible = false;
@@ -150,7 +150,7 @@ function UserProfileCtrl ($scope, $route, $location, $window, $sce, UserSession,
   };
 
   $scope.$watch('user.droppedPhoto', function(droppedPhoto) {
-    if (droppedPhoto) $scope.user.photoUrl = URL.createObjectURL(droppedPhoto);
+    if (droppedPhoto) $scope.user.photo.src = URL.createObjectURL(droppedPhoto);
   });
 }
 
